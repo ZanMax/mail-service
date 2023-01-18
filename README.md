@@ -1,2 +1,4 @@
-# mail-service
+# Mail Service
+
 Service to send emails to the clients
+
