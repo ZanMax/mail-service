@@ -9,14 +9,18 @@ import (
 )
 
 var apiToken string
+var smtpHost string
+var smtpPort string
 
 func main() {
-	err := godotenv.Load("configs/api.env")
+	err := godotenv.Load("configs/config.env")
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 	apiToken = os.Getenv("AUTH_TOKEN")
+	smtpHost = os.Getenv("SMTP_HOST")
+	smtpPort = os.Getenv("SMTP_PORT")
 
 	r := gin.Default()
 	r.GET("/", func(c *gin.Context) {
@@ -38,7 +42,6 @@ func main() {
 
 func authMiddleware(c *gin.Context) {
 	authHeader := c.Request.Header.Get("token")
-
 	if authHeader == apiToken {
 		c.Next()
 	} else {
@@ -51,6 +54,8 @@ func authMiddleware(c *gin.Context) {
 }
 
 func mail(c *gin.Context) {
+	to := []string{"user1@gmail.com"}
+	Mail("someuser@somesite.com", to, "password", "Test", "Test")
 	c.JSON(http.StatusOK, gin.H{
 		"mail": "mail",
 	})
