@@ -54,8 +54,8 @@ func authMiddleware(c *gin.Context) {
 }
 
 func mail(c *gin.Context) {
-	to := []string{"user1@gmail.com"}
-	Mail("someuser@somesite.com", to, "password", "Test", "Test")
+	to := []string{""}
+	MailHTML("", to, "", "Test", "Test")
 	c.JSON(http.StatusOK, gin.H{
 		"mail": "mail",
 	})
