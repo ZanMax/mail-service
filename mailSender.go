@@ -2,9 +2,13 @@ package main
 
 import (
 	"bytes"
+	"encoding/base64"
 	"fmt"
 	"html/template"
+	"log"
 	"net/smtp"
+	"os"
+	"strings"
 )
 
 type Mail struct {
@@ -56,6 +60,44 @@ func MessageBuilder(mail Mail) string {
 	return msg
 }
 
-func MailWithAttachment() {
-	//TODO
+func MailWithAttachment(mail Mail, attachments []string) []byte {
+
+	var buf bytes.Buffer
+
+	buf.WriteString(fmt.Sprintf("From: %s\r\n", mail.From))
+	buf.WriteString(fmt.Sprintf("To: %s\r\n", strings.Join(mail.To, ";")))
+	buf.WriteString(fmt.Sprintf("Subject: %s\r\n", mail.Subject))
+
+	boundary := "next-part"
+	buf.WriteString("MIME-Version: 1.0\r\n")
+	buf.WriteString(fmt.Sprintf("Content-Type: multipart/mixed; boundary=%s\n",
+		boundary))
+
+	buf.WriteString(fmt.Sprintf("\r\n--%s\r\n", boundary))
+	buf.WriteString("Content-Type: text/html; charset=\"utf-8\"\r\n")
+	buf.WriteString(fmt.Sprintf("\r\n%s", mail.Body))
+	buf.WriteString(fmt.Sprintf("\r\n--%s\r\n", boundary))
+
+	for _, attachment := range attachments {
+		buf.WriteString("Content-Transfer-Encoding: base64\r\n")
+		buf.WriteString(fmt.Sprintf("Content-Disposition: attachment; filename=%s\r\n", attachment))
+		buf.WriteString("\r\n")
+
+		data := readFile(attachment)
+
+		b := make([]byte, base64.StdEncoding.EncodedLen(len(data)))
+		base64.StdEncoding.Encode(b, data)
+		buf.Write(b)
+		buf.WriteString(fmt.Sprintf("\r\n--%s\r\n", boundary))
+	}
+
+	return buf.Bytes()
+}
+
+func readFile(path string) []byte {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return data
 }
