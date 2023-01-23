@@ -32,13 +32,11 @@ func MailHTML(from string, to []string, password string, subject string, bodyMsg
 		Message: bodyMsg,
 	})
 
-	result := tpl.String()
-
 	request := Mail{
 		From:    from,
 		To:      to,
 		Subject: subject,
-		Body:    result,
+		Body:    tpl.String(),
 	}
 
 	msg := MessageBuilder(request)
@@ -52,11 +50,12 @@ func MailHTML(from string, to []string, password string, subject string, bodyMsg
 }
 
 func MessageBuilder(mail Mail) string {
-	msg := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
-	msg += fmt.Sprintf("From: %s\\n", mail.From)
-	msg += fmt.Sprintf("To: %s\\n", mail.To)
-	msg += fmt.Sprintf("Subject: %s\\n\\n", mail.Subject)
-	msg += fmt.Sprintf("%s\\n", mail.Body)
+	msg := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\r\n"
+	msg += fmt.Sprintf("From: %s\r\n", mail.From)
+	msg += fmt.Sprintf("To: %s\r\n", strings.Join(mail.To, ";"))
+	msg += fmt.Sprintf("Subject: %s\r\n", mail.Subject)
+	msg += fmt.Sprintf("\r\n%s\r\n", mail.Body)
+
 	return msg
 }
 
