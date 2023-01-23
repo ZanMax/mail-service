@@ -18,9 +18,9 @@ type Mail struct {
 	Body    string
 }
 
-func MailHTML(from string, to []string, password string, subject string, bodyMsg string) {
+func MailSender(from string, to []string, password string, subject string, bodyMsg string, attachments []string, templateFile string) {
 
-	t, _ := template.ParseFiles("templates/test.html")
+	t, _ := template.ParseFiles(fmt.Sprintf("templates/%s", templateFile))
 
 	var tpl bytes.Buffer
 
@@ -39,10 +39,17 @@ func MailHTML(from string, to []string, password string, subject string, bodyMsg
 		Body:    tpl.String(),
 	}
 
-	msg := MessageBuilder(request)
+	var resultMessage []byte
+	if len(attachments) > 0 {
+		msg := MessageBuilderWithAttachment(request, attachments)
+		resultMessage = []byte(msg)
+	} else {
+		msg := MessageBuilder(request)
+		resultMessage = []byte(msg)
+	}
 
 	auth := smtp.PlainAuth("", from, password, smtpHost)
-	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, to, []byte(msg))
+	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, to, resultMessage)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -59,7 +66,7 @@ func MessageBuilder(mail Mail) string {
 	return msg
 }
 
-func MailWithAttachment(mail Mail, attachments []string) []byte {
+func MessageBuilderWithAttachment(mail Mail, attachments []string) []byte {
 
 	var buf bytes.Buffer
 
