@@ -18,19 +18,17 @@ type Mail struct {
 	Body    string
 }
 
-func MailSender(from string, to []string, password string, subject string, bodyMsg string, attachments []string, templateFile string) {
+func MailSender(from string, to []string, password string, subject string, bodyMsg string, attachments []string, templateFile string, params interface{}) {
 
 	t, _ := template.ParseFiles(fmt.Sprintf("templates/%s", templateFile))
 
 	var tpl bytes.Buffer
 
-	t.Execute(&tpl, struct {
-		Title   string
-		Message string
-	}{
-		Title:   "Title",
-		Message: bodyMsg,
-	})
+	errTemplate := t.Execute(&tpl, params)
+	if errTemplate != nil {
+		fmt.Println(errTemplate)
+		return
+	}
 
 	request := Mail{
 		From:    from,
