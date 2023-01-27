@@ -27,6 +27,15 @@ func getMailCredentials(email string) string {
 }
 
 func mailSendSimple(c *gin.Context) {
+	var simpleMail SimpleMail
+	err := c.BindJSON(&simpleMail)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Bad request",
+		})
+		return
+	}
+	fmt.Println(simpleMail)
 	c.JSON(http.StatusOK, gin.H{
 		"status": "sent",
 	})
