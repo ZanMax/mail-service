@@ -32,6 +32,7 @@ func main() {
 	api := r.Group("/api", authMiddleware)
 	api.GET("/mail", mail)
 	api.GET("/mail/:id", mail)
+	api.POST("/mail/send/simple", mailSendSimple)
 
 	err = r.Run(":8000")
 	if err != nil {
@@ -51,12 +52,4 @@ func authMiddleware(c *gin.Context) {
 		c.Abort()
 		return
 	}
-}
-
-func mail(c *gin.Context) {
-	to := []string{""}
-	MailHTML("", to, "", "Test", "Test")
-	c.JSON(http.StatusOK, gin.H{
-		"mail": "mail",
-	})
 }
