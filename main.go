@@ -11,6 +11,7 @@ import (
 var apiToken string
 var smtpHost string
 var smtpPort string
+var dbConnString string
 
 func main() {
 	err := godotenv.Load("configs/config.env")
@@ -21,6 +22,7 @@ func main() {
 	apiToken = os.Getenv("AUTH_TOKEN")
 	smtpHost = os.Getenv("SMTP_HOST")
 	smtpPort = os.Getenv("SMTP_PORT")
+	dbConnString = os.Getenv("DB_CONNECTION_STRING")
 
 	r := gin.Default()
 	r.GET("/", func(c *gin.Context) {
