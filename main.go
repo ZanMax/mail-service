@@ -32,8 +32,8 @@ func main() {
 	})
 
 	api := r.Group("/api", authMiddleware)
-	api.GET("/mail", mail)
-	api.GET("/mail/:id", mail)
+	api.GET("/mail/event/:id", mailEvent)
+	api.POST("/mail/event/:id", mailEvent)
 	api.POST("/mail/send/simple", mailSendSimple)
 
 	err = r.Run(":8000")
